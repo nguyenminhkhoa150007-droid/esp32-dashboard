@@ -25,23 +25,29 @@
         <div><span class="val" id="val-h">--</span> %</div>
     </div>
 
-   <script>
+<script>
         const eraWidget = new EraWidget();
-        const tempElement = document.getElementById('val-t');
-        const humElement = document.getElementById('val-h');
 
         eraWidget.init({
             onValues: function(values) {
-                console.log("Dữ liệu nhận được:", values); // Kiểm tra log tại F12
+                // Kiểm tra log ở F12 để xem chính xác E-Ra gửi gì
+                console.log("Data từ E-Ra:", values); 
 
-                // 1. Quét theo Tên Pin (V1, V2)
-                if (values.V1 !== undefined) tempElement.innerText = values.V1;
-                if (values.V2 !== undefined) humElement.innerText = values.V2;
+                // Cách 1: Bắt theo Tên Virtual Pin bạn đã đặt (Nhietdo, doam)
+                if (values.Nhietdo !== undefined) {
+                    document.getElementById('val-t').innerText = parseFloat(values.Nhietdo).toFixed(1);
+                }
+                if (values.doam !== undefined) {
+                    document.getElementById('val-h').innerText = Math.round(values.doam);
+                }
 
-                // 2. Quét theo Thứ tự (Dành cho trường hợp E-Ra mapping theo mảng cấu hình)
-                // values[0] là Value 1 trong cấu hình, values[1] là Value 2
-                if (values[0] !== undefined) tempElement.innerText = values[0];
-                if (values[1] !== undefined) humElement.innerText = values[1];
+                // Cách 2: Bắt theo số PIN (1, 2) - Dự phòng nếu cách 1 không chạy
+                if (values[1] !== undefined) {
+                    document.getElementById('val-t').innerText = parseFloat(values[1]).toFixed(1);
+                }
+                if (values[2] !== undefined) {
+                    document.getElementById('val-h').innerText = Math.round(values[2]);
+                }
             }
         });
     </script>
