@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>ESP32 E-Ra Realtime</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <script src="https://eoh-jsc.github.io/era-widget/era_widget.js"></script>
+    
+    <style>
+        body { background: #050505; display: flex; justify-content: center; gap: 20px; padding-top: 50px; font-family: 'Share Tech Mono', monospace; color: white;}
+        .card { background: #121212; padding: 30px; border-radius: 15px; text-align: center; border: 2px solid #333; width: 250px; }
+        .val { font-size: 70px; }
+        .t-card { border-color: #ff9d00; color: #ff9d00; }
+        .h-card { border-color: #00d2ff; color: #00d2ff; }
+    </style>
+</head>
+<body>
+    <div class="card t-card">
+        <h3>TEMPERATURE</h3>
+        <div><span class="val" id="val-t">--</span> °C</div>
+    </div>
+    <div class="card h-card">
+        <h3>HUMIDITY</h3>
+        <div><span class="val" id="val-h">--</span> %</div>
+    </div>
+
+    <script>
+        // Khởi tạo thư viện E-Ra
+        const eraWidget = new EraWidget();
+
+        eraWidget.init({
+            // Hàm tự động nhận dữ liệu từ Realtime Configs của E-Ra
+            onValues: function(values) {
+                // V1 tương ứng với Nhiệt độ, V2 tương ứng với Độ ẩm
+                if (values.V1 !== undefined) {
+                    document.getElementById('val-t').innerText = parseFloat(values.V1).toFixed(1);
+                }
+                if (values.V2 !== undefined) {
+                    document.getElementById('val-h').innerText = Math.round(values.V2);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
