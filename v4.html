@@ -26,29 +26,26 @@
         <div><span class="val" id="val-h">--</span> %</div>
     </div>
 
-    <script>
+<script>
         const eraWidget = new EraWidget();
         const tempEl = document.getElementById('val-t');
         const humEl = document.getElementById('val-h');
 
         eraWidget.init({
             onValues: function(values) {
-                // Log để kiểm tra dữ liệu thực tế chảy xuống Iframe
                 console.log("Dữ liệu nhận được:", values);
 
-                // Ưu tiên bắt theo tên bạn đặt trên Dashboard (Nhietdo, doam)
-                if (values.Nhietdo !== undefined) {
-                    tempEl.innerText = values.Nhietdo;
-                }
-                if (values.doam !== undefined) {
-                    humEl.innerText = values.doam;
-                }
+                // Chiến thuật 1: Quét theo tên Datastream bạn đặt (Nhietdo, doam)
+                if (values.Nhietdo !== undefined) tempEl.innerText = values.Nhietdo;
+                if (values.doam !== undefined) humEl.innerText = values.doam;
 
-                // Dự phòng bắt theo ID số (1, 2)
+                // Chiến thuật 2: Quét theo số Pin thực tế (Pin 1 và Pin 2)
                 if (values[1] !== undefined) tempEl.innerText = values[1];
                 if (values[2] !== undefined) humEl.innerText = values[2];
+
+                // Chiến thuật 3: Quét theo nhãn Title bạn đã gõ (nhr, daa)
+                if (values.nhr !== undefined) tempEl.innerText = values.nhr;
+                if (values.daa !== undefined) humEl.innerText = values.daa;
             }
         });
     </script>
-</body>
-</html>
