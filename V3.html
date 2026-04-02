@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>ESP32 Dashboard V3</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Montserrat:wght@900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #0a0a1a; /* Nền xanh đen đậm */
+            color: #fff; font-family: 'Montserrat', sans-serif; 
+            display: flex; flex-direction: column; align-items: center; padding-top: 15px; 
+        }
+        
+        /* Tiêu đề nhận diện phiên bản mới */
+        .version-badge {
+            background: #ff007f; color: white; padding: 8px 20px; 
+            border-radius: 30px; font-size: 18px; font-weight: 900;
+            letter-spacing: 2px; margin-bottom: 15px;
+            box-shadow: 0 0 20px #ff007f;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        /* Màn hình chẩn đoán V3 */
+        #debug-log { 
+            background: #111; border: 2px dashed #00e5ff; width: 90%; max-width: 750px; 
+            padding: 15px; border-radius: 8px; font-family: monospace; font-size: 14px; 
+            color: #00e5ff; word-wrap: break-word; margin-bottom: 25px; 
+        }
+
+        .dashboard { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; }
+        .card { 
+            background: #1a1a2e; width: 320px; height: 220px; border-radius: 20px; 
+            padding: 25px; display: flex; flex-direction: column; 
+            border: 2px solid #333;
+        }
+        .card-header { display: flex; justify-content: space-between; font-size: 16px; letter-spacing: 1px; }
+        .card-body { flex-grow: 1; display: flex; justify-content: center; align-items: center; }
+        .value { font-family: 'Share Tech Mono', monospace; font-size: 85px; text-shadow: 0 0 15px currentColor; }
+        .unit { font-size: 25px; margin-left: 10px; margin-top: 25px; }
+        
+        /* Đổi màu Card cho khác biệt */
+        .temp-card { border-color: #ff3366; } .temp-card .title, .temp-card .value { color: #ff3366; }
+        .hum-card { border-color: #00ffcc; } .hum-card .title, .hum-card .value { color: #00ffcc; }
+    </style>
+</head>
+<body>
+
+    <div class="version-badge">PHIÊN BẢN 3.0 - ĐÃ XÓA CACHE</div>
+
+    <div id="debug-log">Đang chờ gói tin từ E-Ra...</div>
+
+    <div class="dashboard">
+        <div class="card temp-card">
+            <div class="card-header"><span class="title">NHIỆT ĐỘ</span><span>🔥</span></div>
+            <div class="card-body"><span class="value" id="val-t">--</span><span class="unit">°C</span></div>
+        </div>
+        <div class="card hum-card">
+            <div class="card-header"><span class="title">ĐỘ ẨM</span><span>💦</span></div>
+            <div class="card-body"><span class="value" id="val-h">--</span><span class="unit">%</span></div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('message', function(event) {
+            let p = event.data;
+            if (!p) return;
+            
+            // Ép kiểu chuỗi để kiểm tra
+            let rawStr = typeof p === 'object' ? JSON.stringify(p) : String(p);
+            
+            // Chặn tin rác tọa độ khung hình của E-Ra
+            if (rawStr.includes('iframe-pos') || rawStr.includes('webpack')) return;
+
+            // In dữ liệu thô ra màn hình Debug
+            document.getElementById('debug-log').innerText = "CÓ TÍN HIỆU: " + rawStr;
+
+            try {
+                // Thuật toán siêu bóc tách
+                let dataObj = typeof p === 'string' ? JSON.parse(p) : p;
+                let target = dataObj.data || dataObj.value || dataObj;
+
+                let t, h;
+                
+                // Trường hợp 1: Gửi 1 cục {V1: 28, V2: 58}
+                if (target.V1 !== undefined) t = target.V1;
+                if (target.V2 !== undefined) h = target.V2;
+
+                // Trường hợp 2: Gửi từng biến {pin: "V1", value: 28}
+                if (dataObj.pin === "V1" || dataObj.pin === 1) t = dataObj.value;
+                if (dataObj.pin === "V2" || dataObj.pin === 2) h = dataObj.value;
+
+                // Hiển thị lên số to
+                if (t !== undefined) document.getElementById('val-t').innerText = parseFloat(t).toFixed(1);
+                if (h !== undefined) document.getElementById('val-h').innerText = Math.round(h);
+                
+            } catch (e) {
+                console.log("Lỗi tách số:", e);
+            }
+        });
+    </script>
+</body>
+</html>
