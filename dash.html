@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Sensor Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #050505; color: #ffffff;
+            font-family: 'Montserrat', sans-serif; display: flex;
+            justify-content: center; align-items: center;
+            height: 100vh; position: relative;
+        }
+        /* Thanh Debug hiển thị dữ liệu thô */
+        #debug-box {
+            position: absolute; top: 0; left: 0; width: 100%;
+            background-color: #d32f2f; color: white; padding: 10px;
+            text-align: center; font-family: monospace; font-size: 12px;
+            z-index: 9999; word-wrap: break-word;
+        }
+        .dashboard { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-top: 40px;}
+        .card {
+            background-color: #121212; width: 350px; height: 250px; border-radius: 15px;
+            padding: 25px; display: flex; flex-direction: column; position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .card-header { display: flex; justify-content: space-between; align-items: center; font-size: 16px; letter-spacing: 1.5px; }
+        .card-body { flex-grow: 1; display: flex; justify-content: center; align-items: center; }
+        .value { font-family: 'Share Tech Mono', monospace; font-size: 90px; line-height: 1; }
+        .unit { font-size: 30px; margin-left: 10px; margin-top: 30px; font-weight: normal; }
+        .temp-card { border-top: 3px solid #ff9d00; }
+        .temp-card .title { color: #ff9d00; }
+        .temp-card .value { color: #ffb700; }
+        .hum-card { border-top: 3px solid #00d2ff; }
+        .hum-card .title { color: #00d2ff; }
+        .hum-card .value { color: #00e5ff; }
+    </style>
+</head>
+<body>
+
+    <div id="debug-box">ĐANG CHỜ TÍN HIỆU TỪ E-RA... (Nếu sau 5s không đổi màu, E-Ra chưa gửi data)</div>
+
+    <div class="dashboard">
+        <div class="card temp-card">
+            <div class="card-header"><span class="title">TEMPERATURE</span><span class="icon">🌡️</span></div>
+            <div class="card-body"><span class="value" id="temp-val">0.0</span><span class="unit">°C</span></div>
+        </div>
+
+        <div class="card hum-card">
+            <div class="card-header"><span class="title">HUMIDITY</span><span class="icon">💧</span></div>
+            <div class="card-body"><span class="value" id="hum-val">0</span><span class="unit">%</span></div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('message', function(event) {
+            try {
+                let payload = event.data;
+                if (!payload) return;
+                
+                // Ép kiểu mọi thứ thành chuỗi để in ra màn hình
+                let rawStr = typeof payload === 'object' ? JSON.stringify(payload) : payload;
+
+                // Bỏ qua các gói tin báo vị trí (iframe-pos) hoặc tin rác nội bộ
+                if (rawStr.includes('iframe-pos') || rawStr.includes('webpack')) return;
+
+                // NẾU CÓ DATA THỰC SỰ -> Đổi nền màu xanh và in lên thanh trên cùng
+                let debugBox = document.getElementById('debug-box');
+                debugBox.style.backgroundColor = "#2e7d32"; // Chuyển sang xanh lá
+                debugBox.innerText = "DATA: " + rawStr;
+
+            } catch (error) {
+                document.getElementById('debug-box').innerText = "LỖI PARSE JSON: " + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
