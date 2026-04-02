@@ -25,22 +25,23 @@
         <div><span class="val" id="val-h">--</span> %</div>
     </div>
 
-    <script>
-        // Khởi tạo thư viện E-Ra
+   <script>
         const eraWidget = new EraWidget();
+        const tempElement = document.getElementById('val-t');
+        const humElement = document.getElementById('val-h');
 
         eraWidget.init({
-            // Hàm tự động nhận dữ liệu từ Realtime Configs của E-Ra
             onValues: function(values) {
-                // V1 tương ứng với Nhiệt độ, V2 tương ứng với Độ ẩm
-                if (values.V1 !== undefined) {
-                    document.getElementById('val-t').innerText = parseFloat(values.V1).toFixed(1);
-                }
-                if (values.V2 !== undefined) {
-                    document.getElementById('val-h').innerText = Math.round(values.V2);
-                }
+                console.log("Dữ liệu nhận được:", values); // Kiểm tra log tại F12
+
+                // 1. Quét theo Tên Pin (V1, V2)
+                if (values.V1 !== undefined) tempElement.innerText = values.V1;
+                if (values.V2 !== undefined) humElement.innerText = values.V2;
+
+                // 2. Quét theo Thứ tự (Dành cho trường hợp E-Ra mapping theo mảng cấu hình)
+                // values[0] là Value 1 trong cấu hình, values[1] là Value 2
+                if (values[0] !== undefined) tempElement.innerText = values[0];
+                if (values[1] !== undefined) humElement.innerText = values[1];
             }
         });
     </script>
-</body>
-</html>
