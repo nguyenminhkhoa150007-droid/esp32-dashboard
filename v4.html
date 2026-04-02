@@ -2,17 +2,18 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>ESP32 E-Ra Realtime</title>
+    <title>ESP32 E-Ra Realtime V4</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
     <script src="https://eoh-jsc.github.io/era-widget/era_widget.js"></script>
     
     <style>
         body { background: #050505; display: flex; justify-content: center; gap: 20px; padding-top: 50px; font-family: 'Share Tech Mono', monospace; color: white;}
-        .card { background: #121212; padding: 30px; border-radius: 15px; text-align: center; border: 2px solid #333; width: 250px; }
-        .val { font-size: 70px; }
+        .card { background: #121212; padding: 30px; border-radius: 15px; text-align: center; border: 2px solid #333; width: 250px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .val { font-size: 70px; font-weight: bold; }
         .t-card { border-color: #ff9d00; color: #ff9d00; }
         .h-card { border-color: #00d2ff; color: #00d2ff; }
+        h3 { margin-bottom: 10px; letter-spacing: 2px; }
     </style>
 </head>
 <body>
@@ -25,29 +26,29 @@
         <div><span class="val" id="val-h">--</span> %</div>
     </div>
 
-<script>
+    <script>
         const eraWidget = new EraWidget();
+        const tempEl = document.getElementById('val-t');
+        const humEl = document.getElementById('val-h');
 
         eraWidget.init({
             onValues: function(values) {
-                // Kiểm tra log ở F12 để xem chính xác E-Ra gửi gì
-                console.log("Data từ E-Ra:", values); 
+                // Log để kiểm tra dữ liệu thực tế chảy xuống Iframe
+                console.log("Dữ liệu nhận được:", values);
 
-                // Cách 1: Bắt theo Tên Virtual Pin bạn đã đặt (Nhietdo, doam)
+                // Ưu tiên bắt theo tên bạn đặt trên Dashboard (Nhietdo, doam)
                 if (values.Nhietdo !== undefined) {
-                    document.getElementById('val-t').innerText = parseFloat(values.Nhietdo).toFixed(1);
+                    tempEl.innerText = values.Nhietdo;
                 }
                 if (values.doam !== undefined) {
-                    document.getElementById('val-h').innerText = Math.round(values.doam);
+                    humEl.innerText = values.doam;
                 }
 
-                // Cách 2: Bắt theo số PIN (1, 2) - Dự phòng nếu cách 1 không chạy
-                if (values[1] !== undefined) {
-                    document.getElementById('val-t').innerText = parseFloat(values[1]).toFixed(1);
-                }
-                if (values[2] !== undefined) {
-                    document.getElementById('val-h').innerText = Math.round(values[2]);
-                }
+                // Dự phòng bắt theo ID số (1, 2)
+                if (values[1] !== undefined) tempEl.innerText = values[1];
+                if (values[2] !== undefined) humEl.innerText = values[2];
             }
         });
     </script>
+</body>
+</html>
