@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>E-Ra Final</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <script src="https://www.unpkg.com/@eohjsc/era-widget@1.0.14/dist/era-widget.js"></script>
+    
+    <style>
+        body { background: #000; color: #fff; font-family: 'Share Tech Mono', monospace; display: flex; justify-content: center; gap: 20px; padding-top: 40px; }
+        .card { border: 2px solid #444; padding: 20px; border-radius: 15px; width: 200px; text-align: center; }
+        .val { font-size: 60px; display: block; margin: 10px 0; color: #00ff00; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h3>TEMP</h3>
+        <span class="val" id="t">--</span>
+    </div>
+    <div class="card">
+        <h3>HUMID</h3>
+        <span class="val" id="h">--</span>
+    </div>
+
+    <script>
+        // Đợi thư viện tải xong hoàn toàn
+        window.onload = function() {
+            if (typeof EraWidget === 'undefined') {
+                document.body.innerHTML = "<h2 style='color:red; text-align:center;'>LỖI: KHÔNG TẢI ĐƯỢC THƯ VIỆN E-RA!</h2>";
+                return;
+            }
+
+            const eraWidget = new EraWidget();
+            eraWidget.init({
+                onValues: (values) => {
+                    console.log("Dữ liệu về:", values);
+                    // Quét mọi trường hợp ID Pin (1, 2) hoặc Tên Pin (Nhietdo, doam)
+                    if (values.Nhietdo !== undefined) document.getElementById('t').innerText = values.Nhietdo;
+                    else if (values[1] !== undefined) document.getElementById('t').innerText = values[1];
+
+                    if (values.doam !== undefined) document.getElementById('h').innerText = values.doam;
+                    else if (values[2] !== undefined) document.getElementById('h').innerText = values[2];
+                }
+            });
+        };
+    </script>
+</body>
+</html>
